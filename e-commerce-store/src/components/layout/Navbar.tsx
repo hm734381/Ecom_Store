@@ -1,8 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Button from '../common/Button';
+import { useAuth } from '@/lib/hooks/useAuth';
 
 const Navbar = () => {
+  const { state, logout } = useAuth();
+  const { user, isAuthenticated } = state;
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  const toggleUserMenu = () => {
+    setIsUserMenuOpen(!isUserMenuOpen);
+  };
+
   return (
     <nav className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -25,11 +34,56 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Button variant="primary" size="sm">
-                Sign In
-              </Button>
-            </div>
+            {isAuthenticated ? (
+              <div className="relative ml-3">
+                <div>
+                  <button
+                    type="button"
+                    className="flex items-center max-w-xs rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    onClick={toggleUserMenu}
+                  >
+                    <span className="mr-2 text-gray-700">{user?.name}</span>
+                    <span className="inline-block h-8 w-8 overflow-hidden rounded-full bg-gray-200">
+                      <svg className="h-full w-full text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      Your Profile
+                    </Link>
+                    <Link href="/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      Your Orders
+                    </Link>
+                    {user?.role === 'admin' && (
+                      <Link href="/admin" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        logout();
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex-shrink-0">
+                <Link href="/login">
+                  <Button variant="primary" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+              </div>
+            )}
             <div className="ml-4 flex items-center md:ml-6">
               <button className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 <span className="sr-only">View cart</span>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Layout from '../components/layout/Layout';
 import ToastProvider from '../components/common/ToastProvider';
+import { AuthProvider } from '../lib/hooks/useAuth';
 import './globals.css';
 
 const inter = Inter({ 
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="en" className={inter.className}>
       <body>
         <ToastProvider>
-          <Layout>{children}</Layout>
+          <AuthProvider>
+            <Layout>{children}</Layout>
+          </AuthProvider>
         </ToastProvider>
       </body>
     </html>
